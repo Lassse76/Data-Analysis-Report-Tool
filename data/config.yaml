@@ -1,0 +1,30 @@
+
+dataset:
+  completation:
+    type: linear
+exclude:
+- patient_id
+- sex
+- admission_type
+imputation:
+  type: Mice
+lookup: lookup.yaml
+missingness:
+  patterns:
+  - mechanism: MCAR
+    proportion: 0.3
+  - mechanism: MAR
+    proportion: 0.3
+  - mechanism: MNAR
+    proportion: 0.3
+paths:
+  data: null
+  lookup_imputation: null
+prediction:
+  name: null
+  params:
+    learning_rate: null
+    n_estimator: null
+seed: 42
+target: mortality
+testsplit: 0.2

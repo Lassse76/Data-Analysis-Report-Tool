@@ -1,0 +1,114 @@
+variables:
+  - id: patient_id
+    synonym: [id, patient id, patientid]
+    method: "None"
+    variant: "None"
+    perturbation: "None"
+
+  - id: age
+    synonym: [years, patient age]
+    method: sm.OLS
+    variant: "None"
+    perturbation: boot
+
+  - id: sex
+    synonym: [gender]
+    method: sm.GLM
+    variant: sm.families.Binomial()
+    perturbation: boot
+
+  - id: admission_type
+    synonym: [admission, admission type, admit type]
+    method: sm.GLM
+    variant: sm.families.Binomial()
+    perturbation: boot
+
+  - id: los_days
+    synonym: [length of stay, length-of-stay, los]
+    method: sm.OLS
+    variant: "None"
+    perturbation: boot
+
+  - id: bmi
+    synonym: [body-mass-index, body mass index]
+    method: sm.OLS
+    variant: "None"
+    perturbation: boot
+
+  - id: sbp
+    synonym: [systolic, systolic blood pressure, systolic bp]
+    method: sm.OLS
+    variant: "None"
+    perturbation: boot
+
+  - id: dbp
+    synonym: [diastolic, diastolic blood pressure, diastolic bp]
+    method: sm.OLS
+    variant: "None"
+    perturbation: boot
+
+  - id: heart_rate
+    synonym: [hr, pulse, heart rate]
+    method: sm.OLS
+    variant: "None"
+    perturbation: boot
+
+  - id: resp_rate
+    synonym: [respiratory rate, resp rate, rr]
+    method: sm.OLS
+    variant: "None"
+    perturbation: boot
+
+  - id: temperature
+    synonym: [temp, body temperature]
+    method: sm.OLS
+    variant: "None"
+    perturbation: boot
+
+  - id: spo2
+    synonym: [oxygen saturation, o2 sat, sat]
+    method: sm.OLS
+    variant: "None"
+    perturbation: boot
+
+  - id: glucose
+    synonym: [blood glucose, blood sugar]
+    method: sm.OLS
+    variant: "None"
+    perturbation: boot
+
+  - id: creatinine
+    synonym: [creat, serum creatinine]
+    method: sm.OLS
+    variant: "None"
+    perturbation: boot
+
+  - id: hemoglobin
+    synonym: [hgb, hb, haemoglobin]
+    method: sm.OLS
+    variant: "None"
+    perturbation: boot
+
+  - id: wbc
+    synonym: [white blood cell count, white blood cells, leukocytes]
+    method: sm.OLS
+    variant: "None"
+    perturbation: boot
+
+  - id: sodium
+    synonym: [na, serum sodium]
+    method: sm.OLS
+    variant: "None"
+    perturbation: boot
+
+  - id: potassium
+    synonym: [k, serum potassium]
+    method: sm.OLS
+    variant: "None"
+    perturbation: boot
+
+  - id: mortality
+    synonym: [death, died, expired, in-hospital mortality]
+    method: sm.GLM
+    variant: sm.families.Binomial()
+    perturbation: boot

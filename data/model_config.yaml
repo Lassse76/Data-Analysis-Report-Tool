@@ -1,0 +1,150 @@
+sk.RandomForestClassifier:
+  n_estimators: 100
+  criterion: "gini"               # "gini", "entropy", "log_loss"
+  max_depth: null
+  min_samples_split: 2
+  min_samples_leaf: 1
+  min_weight_fraction_leaf: 0.0
+  max_features: "sqrt"            # "sqrt", "log2", int, float, null
+  max_leaf_nodes: null
+  min_impurity_decrease: 0.0
+  bootstrap: true
+  oob_score: false
+  n_jobs: null
+  random_state: null
+  verbose: 0
+  warm_start: false
+  class_weight: null              # "balanced", "balanced_subsample", dict
+  ccp_alpha: 0.0
+  max_samples: null
+  monotonic_cst: null
+
+sk.LogisticRegression:
+  penalty: "l2"                   # "l1", "l2", "elasticnet", null
+  dual: false
+  tol: 0.0001
+  C: 1.0
+  fit_intercept: true
+  intercept_scaling: 1
+  class_weight: null              # "balanced", dict
+  random_state: null
+  solver: "lbfgs"                 # "lbfgs", "liblinear", "newton-cg", "newton-cholesky", "sag", "saga"
+  max_iter: 100
+  verbose: 0
+  warm_start: false
+  n_jobs: null
+  l1_ratio: null
+
+sk.KNeighborsClassifier:
+  n_neighbors: 5
+  weights: "uniform"              # "uniform", "distance"
+  algorithm: "auto"               # "auto", "ball_tree", "kd_tree", "brute"
+  leaf_size: 30
+  p: 2
+  metric: "minkowski"
+  metric_params: null
+  n_jobs: null
+
+sk.GaussianNB:
+  priors: null
+  var_smoothing: 1.0e-9
+
+sk.HistGradientBoostingClassifier:
+  loss: "log_loss"
+  learning_rate: 0.1
+  max_iter: 100
+  max_leaf_nodes: 31
+  max_depth: null
+  min_samples_leaf: 20
+  l2_regularization: 0.0
+  max_features: 1.0
+  max_bins: 255
+  categorical_features: "from_dtype"
+  monotonic_cst: null
+  interaction_cst: null
+  warm_start: false
+  early_stopping: "auto"
+  scoring: "loss"
+  validation_fraction: 0.1
+  n_iter_no_change: 10
+  tol: 1.0e-7
+  verbose: 0
+  random_state: null
+  class_weight: null
+
+
+pa.MultivariateAmputation:
+  prop: 0.5                       # Anteil der Zeilen mit mindestens einem fehlenden Wert
+  patterns: null                  # Liste von Pattern-Dicts (s. u.), null = automatisch erzeugt
+  std: true                       # Daten vor Score-Berechnung standardisieren
+  verbose: false
+  seed: null
+  lower_range: -3                 # Suchbereich für die Shift-Bestimmung
+  upper_range: 3
+  max_diff_with_target: 0.001     # Toleranz zwischen erreichtem und gewünschtem prop
+  max_iter: 100                   # max. Iterationen der binären Suche
+
+# --- Imputation-Metriken ---
+sk.mean_squared_error:
+  sample_weight: null
+  multioutput: "uniform_average"  # "raw_values", "uniform_average", array
+
+sk.root_mean_squared_error:
+  sample_weight: null
+  multioutput: "uniform_average"
+
+sk.mean_absolute_error:
+  sample_weight: null
+  multioutput: "uniform_average"
+
+sk.r2_score:
+  sample_weight: null
+  multioutput: "uniform_average"  # zusätzlich "variance_weighted"
+  force_finite: true
+
+sk.median_absolute_error:
+  multioutput: "uniform_average"
+  sample_weight: null
+
+# --- Prediction-Metriken ---
+sk.f1_score:
+  labels: null
+  pos_label: 1
+  average: "binary"               # "binary", "micro", "macro", "weighted", "samples", null
+  sample_weight: null
+  zero_division: "warn"           # "warn", 0.0, 1.0, nan
+
+sk.roc_auc_score:
+  average: "macro"                # "micro", "macro", "weighted", "samples", null
+  sample_weight: null
+  max_fpr: null
+  multi_class: "raise"            # "raise", "ovr", "ovo"
+  labels: null
+
+sk.average_precision_score:
+  average: "macro"
+  pos_label: 1
+  sample_weight: null
+
+sk.balanced_accuracy_score:
+  sample_weight: null
+  adjusted: false
+
+sk.matthews_corrcoef:
+  sample_weight: null
+
+sk.brier_score_loss:
+  sample_weight: null
+  pos_label: null
+  labels: null
+  scale_by_half: "auto"
+
+sk.log_loss:
+  normalize: true
+  sample_weight: null
+  labels: null
+
+sk.confusion_matrix:
+  labels: null
+  sample_weight: null
+  normalize: null                 # "true", "pred", "all", null
