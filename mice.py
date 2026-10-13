@@ -78,17 +78,25 @@ def converte(index,target,settings):
 
 #requirement: /
 #result: Impute is initalized and run
-def setimputer(df,config,type,burn_in=10,update_circle = 3,imputation_iteration = 10):
+def setimputer(df,config):
     imp = mice.MICEData(df) #Mice imputer initialized
     for col,kwds in config.items():
         imp.set_imputer(col,**kwds) #set_imputer with configuration set in converte function
+    return imp
+
+def impute(imp,type,mice="detailedMice",burn_in=10,update_circle = 3,imputation_iteration = 10,df=pd.DataFrame()):
+    if mice=="justMice":
+        imp = mice.MICEData(df)
     file_name = []
     imp.update_all(burn_in)
     for i in range(imputation_iteration):
-       imp.update_all(update_circle) #imputer is run #needs to updated
-       imp.data.to_csv(f"data/imputations/{type}0{i}d.csv" )
-       file_name.append(f"data/imputations/{type}0{i}d.csv")
+        imp.update_all(update_circle) #imputer is run #needs to updated
+        imp.data.to_csv(f"data/imputations/{type}0{i}d.csv" )
+        file_name.append(f"data/imputations/{type}0{i}d.csv")
     return file_name
+
+
+
     """print("inf im df:", np.isinf(df.select_dtypes("number")).sum()[lambda s: s > 0])
 
     for v in imp._cycle_order:
@@ -117,5 +125,6 @@ def innit(settings,df,type,df_comp = pd.DataFrame(),burn_in=10,update_circle = 3
         cfg=converte(index,col,settings)
         config.update(cfg)
     #formula,model_weights,config=converte(index,weights,"bmi",settings)
-    df_imputed=setimputer(df,config,type,burn_in,update_circle,imputation_iteration)
+    imp_setting=setimputer(df,config)
+    df_imputed = impute(imp_setting,type,burn_in=burn_in,update_circle=update_circle,imputation_iteration=imputation_iteration)
     return df_imputed

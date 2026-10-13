@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
 
 #requirement: correct file name with correct path,correct seperator if necessary
 #result: dataframe with loaded data is given. If not possible error is given
@@ -68,7 +69,11 @@ def complete_dataset(df,**kwargs):
     #except:
      #   print("Error:Dataframe or Method not found")
 
-
+#requirement: df is a dict
+#result: df values are standardized
+def standardize(df):
+    scaler = StandardScaler()
+    return scaler.fit(df)
 
 
 """
