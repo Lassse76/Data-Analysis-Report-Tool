@@ -71,9 +71,10 @@ def complete_dataset(df,**kwargs):
 
 #requirement: df is a dict
 #result: df values are standardized
-def standardize(df):
-    scaler = StandardScaler()
-    return scaler.fit(df)
+def standardize(train,test):
+    scaler = StandardScaler().fit(train)
+    return (scaler.transform(train),scaler.transform(test))
+     
 
 
 """

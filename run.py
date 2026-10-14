@@ -57,31 +57,26 @@ def create_mapping(df,target,src_lookup): #Pupeline for creating the mapping
 
 #requirement: /
 #result: Initialize run
-def run(src,type="Mice",induce_missingness="ampute",seed =42,test_split_size=0.2,target="mortality",complete_dataset_method ="linear",burn_in=10,update_circle = 3,imputation_iteration = 10): #innit function, under constructions
+def run(src,type="Mice",seed =42,test_split_size=0.2,target="mortality",kwds=None): #innit function, under constructions
     co.resetconfig_final()
     co.read()
     co.readModelConfig()
     co.changeConfig({"seed":seed})
     co.changeConfig({"imputation":{"type":type}})
-    co.changeConfig({"createmissingness": {"type": induce_missingness}})
     co.changeConfig({"testsplit":test_split_size})
     co.changeConfig({"target":target})
-    co.changeConfig({"dataset":{"completation":{"type": complete_dataset_method}}})
-    co.changeConfig({"imputation": {"burn_in":burn_in}})
-    co.changeConfig({"imputation": {"update_circle":update_circle}})
-    co.changeConfig({"imputation": {"imputation_iteration":imputation_iteration}})
+    if kwds != None:
+        co.changeConfig(kwds)
     co.writeConfig(co.data)
    
-    src_lookup=co.data["lookup"]
-    exclude = co.data["exclude"]
    
    
 
     df = sa.innit(src=src)
-    create_mapping(df,"mortality",src_lookup)
+    create_mapping(df,"mortality",co.data["path"]["lookup_table"])
     #print(final_mapping)
         #(final_mapping)
-    df_new= sa.innit(src=src,exclude=exclude)   
+    df_new= sa.innit(src=src,exclude=co.data["exclude"])   
     df_comp = sa.complete_dataset(df_new,method="linear")
     train_x ,test_x = sa.split(df_comp)
 
@@ -90,9 +85,11 @@ def run(src,type="Mice",induce_missingness="ampute",seed =42,test_split_size=0.2
     #x = pr.classifier(train_x,train_y,test_x,threshold=0.5)
     #print(ev.predictionevaluation(test_y,x,method="f1_score"))
     
-    df_incomp_train = mi.create_missingness(train_x)
+    prop=mi.calcamount(0.2,df_comp,co.model_config["pa.MultivariateAmputation"]["patterns"])
+
+    df_incomp_train = mi.create_missingness(train_x,**{"prop":prop,"patterns":co.model_config["pa.MultivariateAmputation"]["patterns"]})
     df_incomp_test = mi.create_missingness(test_x)
-  
+    
         #print(df_incomp_train.isna().sum())
     (test,train) = (mi.innit(final_mapping,df_incomp_test,"test",df_comp=test_x),mi.innit(final_mapping,df_incomp_train,"train",df_comp=train_x))
     results = []
@@ -102,13 +99,14 @@ def run(src,type="Mice",induce_missingness="ampute",seed =42,test_split_size=0.2
                 train = pd.read_csv(file)
         with open(te_file,"r") as file:
                 test = pd.read_csv(file)
-        pred_mod=pr.classifier(train,train_y,test,threshold=0.5)
+        train_std,test_std = sa.standardize(train,test)
+        pred_mod=pr.classifier(train_std,train_y,test_std,threshold=0.5)
         results.append(ev.predictionevaluation(test_y,pred_mod,method="f1_score"))
     print(results)
     print(sum(results)/len(results))
 
 
-    #print(ev.f1score(test_y,pred_mod))
+
     
 
 

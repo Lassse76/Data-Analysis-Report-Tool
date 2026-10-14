@@ -12,9 +12,26 @@ df_inc = sa.innit(src="data/ehr_test_data.csv",exclude=["sex","patient_id","admi
 df = sa.complete_dataset(df)
 
 
+def calcamount(amount,df,patterns=None):
+    print(patterns)
+    if patterns==None:
+        return None
+    row =[len(f["incomplete_vars"])*f["freq"] for f in patterns]
+    prop=0
+    if amount != None:
+        prop = amount* df.shape[1] / sum(row)
+
+    if prop >=1 or prop <= amount:
+        print("Problem with calculation")
+        quit()
+
+    return prop
+
+
+    
 #requirement: only numeric values
 #result: Missingness is induced in the dataframe
-def create_missingness(df,exclude=[],method="MultivariateAmputation",**kwargs):
+def create_missingness(df,exclude=[],method="MultivariateAmputation",amount=20,**kwargs):
     if kwargs:
             
         co.changeModelConfig({f"pa.{method}":{**kwargs}})
@@ -25,15 +42,14 @@ def create_missingness(df,exclude=[],method="MultivariateAmputation",**kwargs):
     
             
 
-    try:
-        df_cp = df[exclude]
-        df_ex = df.drop(columns = exclude)
-        newdf = MultivariateAmputation(**kwargs).fit_transform(df_ex.select_dtypes("number")) # fit MultiariateAmputation
-        newdf= pd.concat([df_cp,newdf],axis=1)
+    
+    df_cp = df[exclude]
+    df_ex = df.drop(columns = exclude)
+    newdf = MultivariateAmputation(**kwargs).fit_transform(df_ex.select_dtypes("number")) # fit MultiariateAmputation
+    newdf= pd.concat([df_cp,newdf],axis=1)
 
-        return newdf #Leak could be created if train/test split is not done before
-    except:
-       print("Error:Amputation did not work")
+    return newdf #Leak could be created if train/test split is not done before
+
 
 #requirement: /
 #result: Dataframe with correlation of the given dataframe is returned
