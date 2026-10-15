@@ -1,4 +1,3 @@
-
 dataset:
   completation:
     type: linear
@@ -8,23 +7,15 @@ exclude:
 - admission_type
 imputation:
   type: Mice
-lookup: lookup.yaml
 missingness:
-  patterns:
-  - mechanism: MCAR
-    proportion: 0.3
-  - mechanism: MAR
-    proportion: 0.3
-  - mechanism: MNAR
-    proportion: 0.3
-paths:
+  type: "pyampute"
+  amount: [0.1,0.2]
+path:
   data: null
-  lookup_imputation: null
-prediction:
-  name: null
-  params:
-    learning_rate: null
-    n_estimator: null
+  lookup_table: [lookup.yaml,lookup.yaml]
+  model_config: [data/model_config.yaml,data/model_config.yaml]
+  output_name: [R1,R2] #How the files are named corresponding to each run. Every entry is one run
 seed: 42
 target: mortality
 testsplit: 0.2
+multiply: 2 #How often to repeat every run
