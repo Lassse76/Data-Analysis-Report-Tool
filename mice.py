@@ -13,7 +13,7 @@ df = sa.complete_dataset(df)
 
 
 def calcamount(amount,df,patterns=None):
-    print(patterns)
+
     if patterns==None:
         return None
     row =[len(f["incomplete_vars"])*f["freq"] for f in patterns]
@@ -21,6 +21,7 @@ def calcamount(amount,df,patterns=None):
     if amount != None:
         prop = amount* df.shape[1] / sum(row)
 
+  
     if prop >=1 or prop <= amount:
         print("Problem with calculation")
         quit()
@@ -37,7 +38,7 @@ def create_missingness(df,exclude=[],method="MultivariateAmputation",amount=20,*
         co.changeModelConfig({f"pa.{method}":{**kwargs}})
 
     co.readconfig_final()
-    if f"pa.{method}" not in co.cf:
+    if co.cf ==None or f"pa.{method}" not in co.cf:
         co.writeConfig({f"pa.{method}":co.model_config[f"pa.{method}"]})
     
             
@@ -100,15 +101,15 @@ def setimputer(df,config):
         imp.set_imputer(col,**kwds) #set_imputer with configuration set in converte function
     return imp
 
-def impute(imp,type,mice="detailedMice",burn_in=10,update_circle = 3,imputation_iteration = 10,df=pd.DataFrame()):
+def impute(imp,type,mice="detailedMice",burn_in=10,update_circle = 3,imputation_iteration = 10,df=pd.DataFrame(),output_name="R1"):
     if mice=="justMice":
         imp = mice.MICEData(df)
     file_name = []
     imp.update_all(burn_in)
     for i in range(imputation_iteration):
         imp.update_all(update_circle) #imputer is run #needs to updated
-        imp.data.to_csv(f"data/imputations/{type}0{i}d.csv" )
-        file_name.append(f"data/imputations/{type}0{i}d.csv")
+        imp.data.to_csv(f"data/imputations/{type}{output_name}{i}d.csv" )
+        file_name.append(f"data/imputations/{type}{output_name}{i}d.csv")
     return file_name
 
 
@@ -129,7 +130,7 @@ def impute(imp,type,mice="detailedMice",burn_in=10,update_circle = 3,imputation_
 
 #requirement: /
 #result: Initialize mice imputazion and evaluate
-def innit(settings,df,type,df_comp = pd.DataFrame(),burn_in=10,update_circle = 3,imputation_iteration = 10):
+def innit(settings,df,type,df_comp = pd.DataFrame(),burn_in=10,update_circle = 3,imputation_iteration = 10,output_name="R1"):
     keys = [*settings]
     if df_comp.empty: #fallback if df is not complete
         df_comp = sa.complete_dataset(df)
@@ -142,5 +143,5 @@ def innit(settings,df,type,df_comp = pd.DataFrame(),burn_in=10,update_circle = 3
         config.update(cfg)
     #formula,model_weights,config=converte(index,weights,"bmi",settings)
     imp_setting=setimputer(df,config)
-    df_imputed = impute(imp_setting,type,burn_in=burn_in,update_circle=update_circle,imputation_iteration=imputation_iteration)
+    df_imputed = impute(imp_setting,type,burn_in=burn_in,update_circle=update_circle,imputation_iteration=imputation_iteration,output_name=output_name)
     return df_imputed

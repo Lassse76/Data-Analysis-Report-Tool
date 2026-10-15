@@ -38,9 +38,9 @@ def writeConfig(mc):
 
 #requirement: /
 #result: model_config has been read
-def readModelConfig():
+def readModelConfig(src):
     global model_config
-    with open("data/model_config.yaml") as f:
+    with open(src) as f:
         model_config = yaml.safe_load(f)
 
 #requirement: input is dict
