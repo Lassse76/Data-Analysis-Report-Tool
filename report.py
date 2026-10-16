@@ -191,7 +191,7 @@ def constructdf(lines):
     return pd.DataFrame.from_dict(dic)
     
 def toexcel(df = pd.DataFrame()):
-     df.to_excel("result.xlsx",sheet_name="Results")
+     df.to_excel("result.xlsx",sheet_name="Results",index=False)
      
      
 
