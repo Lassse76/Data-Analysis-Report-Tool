@@ -1,6 +1,9 @@
 import run as ru
 import report as re
 
-ru.run("data/ehr_data.csv")
+res=ru.run("data/ehr_data.csv")
 
-re.extraction(output_type="txt")
+ress= re.constructdf([["missingness","amount"],("f1",res)])
+re.toexcel(ress)
+
+#re.extraction(output_type="md")

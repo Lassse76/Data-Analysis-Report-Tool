@@ -1,7 +1,7 @@
 import yaml
 import pylatex 
 from pathlib import Path
-
+import config as co
 import pandas as pd
 
 cfg_dict = {}
@@ -158,6 +158,43 @@ Required user interaction and level of expertise|27b|...|
 Next steps for future research regarding applicability and generalisability|27c|...|
 
 """
+
+#requirement: dic is a dict and target a list of strings
+#result: corresponding value to target key is returned
+def searchdict(dic,target):
+    try:
+        print(target)
+        if len(target)==0:
+            return None
+        if type(dic[target[0]])==list:
+            return dic[target[0]]
+        else:
+            return searchdict(dic[target[0]],target[1:])
+    except:
+         return None    
+   
+#requirement: lines is a list consist of tuples and lists
+#result: a df is constructed out of different parameters
+def constructdf(lines):
+    dic = {}
+    for i in lines:
+        if type(i)==tuple:
+            dic[i[0]]=i[1]
+        else:
+            res = searchdict(co.data,i)
+            if res:
+                dic[i[-1]]= res
+            else:
+                res = searchdict(co.cf,i)
+                if res:
+                    dic[i]= res
+    return pd.DataFrame.from_dict(dic)
+    
+def toexcel(df = pd.DataFrame()):
+     df.to_excel("result.xlsx",sheet_name="Results")
+     
+     
+
 
 #requirement: /
 #result: config_final has been read

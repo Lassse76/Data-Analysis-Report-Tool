@@ -58,6 +58,7 @@ def create_mapping(df,target,src_lookup): #Pupeline for creating the mapping
 #requirement: /
 #result: Initialize run
 def run(src,type="Mice",seed =42,test_split_size=0.2,target="mortality",kwds=None): #innit function, under constructions
+    res=[]
     co.read()
     co.readconfig_final()
     
@@ -110,8 +111,9 @@ def run(src,type="Mice",seed =42,test_split_size=0.2,target="mortality",kwds=Non
                 train_std,test_std = sa.standardize(train,test)
                 pred_mod=pr.classifier(train_std,train_y,test_std,threshold=0.5)
                 results.append(ev.predictionevaluation(test_y,pred_mod,method="f1_score"))
-            print(results)
-            print(sum(results)/len(results))
+            #print(results)
+            res.append(sum(results)/len(results))
+    return res
 
 
 
