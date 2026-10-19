@@ -58,7 +58,8 @@ def create_mapping(df,target,src_lookup): #Pupeline for creating the mapping
 #requirement: /
 #result: Initialize run
 def run(src,type="Mice",seed =42,test_split_size=0.2,target="mortality",kwds=None): #innit function, under constructions
-    res=[]
+    res={}
+    temp_res={}
     co.read()
     co.readconfig_final()
     
@@ -69,8 +70,13 @@ def run(src,type="Mice",seed =42,test_split_size=0.2,target="mortality",kwds=Non
     if kwds != None:
         co.changeConfig(kwds)
     co.writeConfig(co.data)
+    for method in co.data["evaluation"]["method"]:
+        res[method]=[]
+        temp_res[method]=[]
+    print(res)
     for lookup,model_config,amount,output_name in zip(co.data["path"]["lookup_table"],co.data["path"]["model_config"],co.data["missingness"]["amount"],co.data["path"]["output_name"]):
         for i in range(co.data["multiply"]):
+            
             output_name = ("R"*i)+output_name 
             co.readModelConfig(model_config)
             co.resetconfig_final()
@@ -101,7 +107,7 @@ def run(src,type="Mice",seed =42,test_split_size=0.2,target="mortality",kwds=Non
                 
                 #print(df_incomp_train.isna().sum())
             (test,train) = (mi.innit(final_mapping,df_incomp_test,"test",df_comp=test_x,output_name=output_name),mi.innit(final_mapping,df_incomp_train,"train",df_comp=train_x,output_name=output_name))
-            results = []
+            
             for te_file,tr_file in zip(test,train):
 
                 with open(tr_file,"r") as file:
@@ -110,9 +116,12 @@ def run(src,type="Mice",seed =42,test_split_size=0.2,target="mortality",kwds=Non
                         test = pd.read_csv(file)
                 train_std,test_std = sa.standardize(train,test)
                 pred_mod=pr.classifier(train_std,train_y,test_std,threshold=0.5)
-                results.append(ev.predictionevaluation(test_y,pred_mod,method="f1_score"))
+                for method in co.data["evaluation"]["method"]:
+                    temp_res[method].append(ev.predictionevaluation(test_y,pred_mod,method=method))
             #print(results)
-            res.append(sum(results)/len(results))
+            for method in co.data["evaluation"]["method"]:
+                res[method].append(sum(temp_res[method])/len(temp_res[method]))
+                temp_res[method]=[]
     return res
 
 

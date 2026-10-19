@@ -3,6 +3,7 @@ import pylatex
 from pathlib import Path
 import config as co
 import pandas as pd
+import numpy as np
 
 cfg_dict = {}
 cfg_df = ""
@@ -183,11 +184,12 @@ def constructdf(lines):
         else:
             res = searchdict(co.data,i)
             if res:
-                dic[i[-1]]= res
+                dic[i[-1]]= np.repeat(res,co.data["multiply"])
             else:
                 res = searchdict(co.cf,i)
                 if res:
-                    dic[i]= res
+                    dic[i]= res*co.data["multiply"]
+    print(dic)
     return pd.DataFrame.from_dict(dic)
     
 def toexcel(df = pd.DataFrame()):
