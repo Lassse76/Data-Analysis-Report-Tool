@@ -46,7 +46,7 @@ def create_missingness(df,exclude=[],method="MultivariateAmputation",**kwargs):
 
     
     df_cp = df[exclude]
-    df_ex = df.drop(columns = exclude)
+    df_ex = df.drop(columns = exclude) #drop columns that should not be amputed
     newdf = MultivariateAmputation(**kwargs).fit_transform(df_ex.select_dtypes("number")) # fit MultiariateAmputation
     newdf= pd.concat([df_cp,newdf],axis=1)
 
@@ -56,7 +56,7 @@ def create_missingness(df,exclude=[],method="MultivariateAmputation",**kwargs):
 #requirement: /
 #result: Dataframe with correlation of the given dataframe is returned
 def correlation(df):
-    return df.corr() #calculate correlation 
+    return df.corr() #calculate correlation for the imputation formular 
 
 #requirement: /
 #result: Two lists as tupel are returned: ("Name of column","Everey correlation over a specific threshold")
@@ -64,7 +64,7 @@ def getmostcorr(df,mincorr=0.1):
     corrdf = correlation(df) 
     index = {}
     wheights = {}
-    for name,values in corrdf.items(): # only the top three  correlation over specific threshold are used
+    for name,values in corrdf.items():
         filter= (abs(values.values)>mincorr) & (values.index != name) #only take correlation above a specific threshhold
         wheights[name]= sorted(values.values[filter].tolist(),reverse=True,key=lambda t: abs(t))
         index[name]=[k for _,k in sorted(zip(values.values[filter].tolist(),values.index[filter].tolist()),reverse=True,key=lambda t: abs(t[0]))]
@@ -74,7 +74,7 @@ def getmostcorr(df,mincorr=0.1):
 #requirement: /
 #result: Settings are initialized for mice imputation
 def converte(index,target,settings):
-    model_class_map={ #mapping for values in lookup mapping to get corresponding methods
+    model_class_map={ #mapping for values in lookup to get corresponding methods
         "sm.GLM":sm.GLM,
         "sm.OLS":sm.OLS
     }
