@@ -19,10 +19,10 @@ def calcamount(amount,df,patterns=None):
     row =[len(f["incomplete_vars"])*f["freq"] for f in patterns]
     prop=0
     if amount != None:
-        prop = amount* df.shape[1] / sum(row)
+        prop = amount* df.shape[1] / sum(row) #calculate the probability that a row has missing values
 
   
-    if prop >=1 or prop <= amount:
+    if prop >=1 or prop <= amount: #missingness >1 = not enough cells with missingness assigned
         print("Problem with calculation")
         quit()
 
@@ -32,7 +32,8 @@ def calcamount(amount,df,patterns=None):
     
 #requirement: only numeric values
 #result: Missingness is induced in the dataframe
-def create_missingness(df,exclude=[],method="MultivariateAmputation",amount=20,**kwargs):
+def create_missingness(df,exclude=[],method="MultivariateAmputation",**kwargs):
+    #update config_final
     if kwargs:
             
         co.changeModelConfig({f"pa.{method}":{**kwargs}})
@@ -55,7 +56,7 @@ def create_missingness(df,exclude=[],method="MultivariateAmputation",amount=20,*
 #requirement: /
 #result: Dataframe with correlation of the given dataframe is returned
 def correlation(df):
-    return df.corr() 
+    return df.corr() #calculate correlation 
 
 #requirement: /
 #result: Two lists as tupel are returned: ("Name of column","Everey correlation over a specific threshold")
@@ -64,7 +65,7 @@ def getmostcorr(df,mincorr=0.1):
     index = {}
     wheights = {}
     for name,values in corrdf.items(): # only the top three  correlation over specific threshold are used
-        filter= (abs(values.values)>mincorr) & (values.index != name)
+        filter= (abs(values.values)>mincorr) & (values.index != name) #only take correlation above a specific threshhold
         wheights[name]= sorted(values.values[filter].tolist(),reverse=True,key=lambda t: abs(t))
         index[name]=[k for _,k in sorted(zip(values.values[filter].tolist(),values.index[filter].tolist()),reverse=True,key=lambda t: abs(t[0]))]
    
@@ -101,30 +102,16 @@ def setimputer(df,config):
         imp.set_imputer(col,**kwds) #set_imputer with configuration set in converte function
     return imp
 
-def impute(imp,type,mice="detailedMice",burn_in=10,update_circle = 3,imputation_iteration = 10,df=pd.DataFrame(),output_name="R1"):
-    if mice=="justMice":
-        imp = mice.MICEData(df)
+def impute(imp,type,micetype="detailedMice",burn_in=10,update_circle = 3,imputation_iteration = 10,df=pd.DataFrame(),output_name="R1"):
+    if micetype=="justMice":
+        imp = mice.MICEData(df) # if u want to use the standard statsmodel imputer, use justMice 
     file_name = []
-    imp.update_all(burn_in)
+    imp.update_all(burn_in) #burn in to train the imputer
     for i in range(imputation_iteration):
         imp.update_all(update_circle) #imputer is run #needs to updated
         imp.data.to_csv(f"data/imputations/{type}{output_name}{i}d.csv" )
         file_name.append(f"data/imputations/{type}{output_name}{i}d.csv")
     return file_name
-
-
-
-    """print("inf im df:", np.isinf(df.select_dtypes("number")).sum()[lambda s: s > 0])
-
-    for v in imp._cycle_order:
-        try:
-            imp.update(v)
-        except np.linalg.LinAlgError:
-            res = imp.results[v]
-            print("Fehler bei:", v, "| Modell:", imp.model_class[v].__name__)
-            print("Werte:", df[v].dropna().unique()[:10])
-            print("params:", res.params)
-            break"""
 
 
 
@@ -141,7 +128,7 @@ def innit(settings,df,type,df_comp = pd.DataFrame(),burn_in=10,update_circle = 3
             continue
         cfg=converte(index,col,settings)
         config.update(cfg)
-    #formula,model_weights,config=converte(index,weights,"bmi",settings)
+ 
     imp_setting=setimputer(df,config)
-    df_imputed = impute(imp_setting,type,burn_in=burn_in,update_circle=update_circle,imputation_iteration=imputation_iteration,output_name=output_name)
+    df_imputed = impute(imp_setting,type,df=df,burn_in=burn_in,update_circle=update_circle,imputation_iteration=imputation_iteration,output_name=output_name)
     return df_imputed

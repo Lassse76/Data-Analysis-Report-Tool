@@ -60,6 +60,7 @@ def create_mapping(df,target,src_lookup): #Pupeline for creating the mapping
 def run(src,type="Mice",seed =42,test_split_size=0.2,target="mortality",kwds=None): #innit function, under constructions
     res={}
     temp_res={}
+    #config is read and parameter are written to config
     co.read()
     co.readconfig_final()
     
@@ -70,10 +71,11 @@ def run(src,type="Mice",seed =42,test_split_size=0.2,target="mortality",kwds=Non
     if kwds != None:
         co.changeConfig(kwds)
     co.writeConfig(co.data)
-    for method in co.data["evaluation"]["method"]:
+    for method in co.data["evaluation"]["method"]: #initialize dict to save evaluation results
         res[method]=[]
         temp_res[method]=[]
     print(res)
+    #load for every run correct config and run that config i times (according to multiply)
     for lookup,model_config,amount,output_name in zip(co.data["path"]["lookup_table"],co.data["path"]["model_config"],co.data["missingness"]["amount"],co.data["path"]["output_name"]):
         for i in range(co.data["multiply"]):
             
@@ -86,18 +88,19 @@ def run(src,type="Mice",seed =42,test_split_size=0.2,target="mortality",kwds=Non
         
         
 
-            df = sa.innit(src=src)
-            create_mapping(df,"mortality",lookup)
-            df_new= sa.innit(src=src,exclude=co.data["exclude"])   
-            df_comp = sa.complete_dataset(df_new,method="linear")
+            df = sa.innit(src=src) #load data
+            create_mapping(df,"mortality",lookup) #load and initialize lookup settings
+            df_new= sa.innit(src=src,exclude=co.data["exclude"]) #load data with excluded values in lookup settings
+             
+            df_comp = sa.complete_dataset(df_new,method="linear") #fill missing values to get a baseline for imputation evaluation
             train_x ,test_x = sa.split(df_comp)
 
-            (test_x,test_y) = sa.target(test_x,"mortality")
+            (test_x,test_y) = sa.target(test_x,"mortality") #extract target
             (train_x,train_y) = sa.target(train_x,"mortality")
             #x = pr.classifier(train_x,train_y,test_x,threshold=0.5)
             #print(ev.predictionevaluation(test_y,x,method="f1_score"))
             
-            prop=mi.calcamount(amount,df_comp,co.model_config["pa.MultivariateAmputation"]["patterns"])
+            prop=mi.calcamount(amount,df_comp,co.model_config["pa.MultivariateAmputation"]["patterns"]) #calculate amount of missingness (pyampute does not use a direct parameter for the amount of missingness)
             if co.model_config["pa.MultivariateAmputation"]["patterns"] != None:
                 df_incomp_train = mi.create_missingness(train_x,**{"prop":prop,"patterns":co.model_config["pa.MultivariateAmputation"]["patterns"]})
                 df_incomp_test = mi.create_missingness(test_x,**{"prop":prop,"patterns":co.model_config["pa.MultivariateAmputation"]["patterns"]})
@@ -105,10 +108,10 @@ def run(src,type="Mice",seed =42,test_split_size=0.2,target="mortality",kwds=Non
                 df_incomp_train = mi.create_missingness(train_x)
                 df_incomp_test = mi.create_missingness(test_x)
                 
-                #print(df_incomp_train.isna().sum())
+            #run imputation
             (test,train) = (mi.innit(final_mapping,df_incomp_test,"test",df_comp=test_x,output_name=output_name),mi.innit(final_mapping,df_incomp_train,"train",df_comp=train_x,output_name=output_name))
             
-            for te_file,tr_file in zip(test,train):
+            for te_file,tr_file in zip(test,train): #for every imputed dataset run the prediction and evaluation
 
                 with open(tr_file,"r") as file:
                         train = pd.read_csv(file)
@@ -120,7 +123,7 @@ def run(src,type="Mice",seed =42,test_split_size=0.2,target="mortality",kwds=Non
                     temp_res[method].append(ev.predictionevaluation(test_y,pred_mod,method=method))
             #print(results)
             for method in co.data["evaluation"]["method"]:
-                res[method].append(sum(temp_res[method])/len(temp_res[method]))
+                res[method].append(sum(temp_res[method])/len(temp_res[method])) #calculate the average evaluation for every run
                 temp_res[method]=[]
     return res
 

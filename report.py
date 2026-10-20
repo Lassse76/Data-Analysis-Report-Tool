@@ -165,13 +165,13 @@ Next steps for future research regarding applicability and generalisability|27c|
 def searchdict(dic,target):
     try:
         print(target)
-        if len(target)==0:
+        if len(target)==0:  #recursion anchor, happens when the target value is not a list
             return None
-        if type(dic[target[0]])==list:
+        if type(dic[target[0]])==list:  #if dic[target[0]] = the target list to retunr
             return dic[target[0]]
-        else:
-            return searchdict(dic[target[0]],target[1:])
-    except:
+        else:                           #if not search on the next level of the dict
+            return searchdict(dic[target[0]],target[1:]) 
+    except:                             # if the target doesn't exist return None
          return None    
    
 #requirement: lines is a list consist of tuples and lists
@@ -179,21 +179,18 @@ def searchdict(dic,target):
 def constructdf(lines):
     dic = {}
     for i in lines:
-        if type(i)==tuple:
+        if type(i)==tuple: #tuple mean evaluation results ("key name",result)
             dic[i[0]]=i[1]
         else:
             res = searchdict(co.data,i)
             if res:
-                dic[i[-1]]= np.repeat(res,co.data["multiply"])
-            else:
-                res = searchdict(co.cf,i)
-                if res:
-                    dic[i]= res*co.data["multiply"]
+                dic[i[-1]]= np.repeat(res,co.data["multiply"]) # to get the correct length repeat values from config (value from multiply) times
+            
     print(dic)
     return pd.DataFrame.from_dict(dic)
     
 def toexcel(df = pd.DataFrame()):
-     df.to_excel("result.xlsx",sheet_name="Results",index=False)
+     df.to_excel("result.xlsx",sheet_name="Results",index=False) # create excel file from dataframe
      
      
 
@@ -204,17 +201,17 @@ def read():
     global cfg_dict
     global cfg_df
     global cfg_md
-    with open("data/config_final.yaml") as f:
+    with open("data/config_final.yaml") as f: #read final config
         cfg_dict= yaml.safe_load(f)
 
     
-    cfg_df = pd.json_normalize(cfg_dict,sep="__").T
-    cfg_md = cfg_df.to_markdown(**{"headers":["Parameter","Answer"]})
+    cfg_df = pd.json_normalize(cfg_dict,sep="__").T #normalize so its not nested
+    cfg_md = cfg_df.to_markdown(**{"headers":["Parameter","Answer"]}) #converte to markdown
 
 #requirement: /
 #result: markdown file with bullet points to answer has been created
 def survery(type="short",file_name="survey"):
-    if type == "short":
+    if type == "short": #what table is used
         with open(f"{file_name}.md","w") as f:
                 f.write(sh_survey)
 
@@ -231,14 +228,14 @@ def extraction(output_type="latex",detailed=True):
     print("Please fill out following survery.md file. Please use the corresponding tabular with short meaningfull answers.")
 
     while True:
-            print("Done (y/n):")
+            print("Done (y/n):") #if you finished to fill out the table
             y = input()
             if y =="y":
                 text = Path("survey.md").read_text(encoding="utf-8")
                 tables = md_tables_to_dfs(text)
 
                 text = ""
-                for key,value in tables.items():
+                for key,value in tables.items(): #only use lines/tables with answers
                     tables[key]= value[value["Answer"].astype(str).str.strip().str.replace("\u2026","...",regex=False) !="..."]
                     if not tables[key].empty:
                         text = text +"\n\n"+ tables[key].to_markdown(index=False)
@@ -252,7 +249,7 @@ def extraction(output_type="latex",detailed=True):
     print(cfg_md)
     for items in tables.values():
             latex.append(items.to_latex(index=False,escape=True))
-    if output_type=="tex":
+    if output_type=="tex": #write report with choosen output file type
         with open("report.tex","w") as f:
             for el in latex:
                 f.write(f"{el}\n")
