@@ -108,7 +108,7 @@ def run(src,type="Mice",seed =42,test_split_size=0.2,target="mortality",kwds=Non
                 df_incomp_train = mi.create_missingness(train_x)
                 df_incomp_test = mi.create_missingness(test_x)
                 
-            #run imputation
+            #run imputation 
             (test,train) = (mi.innit(final_mapping,df_incomp_test,"test",df_comp=test_x,output_name=output_name),mi.innit(final_mapping,df_incomp_train,"train",df_comp=train_x,output_name=output_name))
             
             for te_file,tr_file in zip(test,train): #for every imputed dataset run the prediction and evaluation
@@ -121,9 +121,9 @@ def run(src,type="Mice",seed =42,test_split_size=0.2,target="mortality",kwds=Non
                 pred_mod=pr.classifier(train_std,train_y,test_std,threshold=0.5)
                 for method in co.data["evaluation"]["method"]:
                     temp_res[method].append(ev.predictionevaluation(test_y,pred_mod,method=method))
-            #print(results)
+   
             for method in co.data["evaluation"]["method"]:
-                res[method].append(sum(temp_res[method])/len(temp_res[method])) #calculate the average evaluation for every run
+                res[method].append(sum(temp_res[method])/len(temp_res[method])) #calculate the average evaluation for every run (sum from every dataset evaluation:amount of datasets)
                 temp_res[method]=[]
     return res
 
@@ -131,10 +131,3 @@ def run(src,type="Mice",seed =42,test_split_size=0.2,target="mortality",kwds=Non
 
         
 
-
-
-
-
-
-
-    #Fehler beim split?

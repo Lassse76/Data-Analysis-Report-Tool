@@ -167,7 +167,7 @@ def searchdict(dic,target):
         print(target)
         if len(target)==0:  #recursion anchor, happens when the target value is not a list
             return None
-        if type(dic[target[0]])==list:  #if dic[target[0]] = the target list to retunr
+        if type(dic[target[0]])==list:  #if dic[target[0]] = the target list to return
             return dic[target[0]]
         else:                           #if not search on the next level of the dict
             return searchdict(dic[target[0]],target[1:]) 
@@ -179,7 +179,7 @@ def searchdict(dic,target):
 def constructdf(lines):
     dic = {}
     for i in lines:
-        if type(i)==tuple: #tuple mean evaluation results ("key name",result)
+        if type(i)==tuple: #tuple is always an evaluation results ("key name",result)
             dic[i[0]]=i[1]
         else:
             res = searchdict(co.data,i)

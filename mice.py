@@ -45,7 +45,7 @@ def create_missingness(df,exclude=[],method="MultivariateAmputation",**kwargs):
             
 
     
-    df_cp = df[exclude]
+    df_cp = df[exclude] #needed so at the end the columns can be merged back togeter
     df_ex = df.drop(columns = exclude) #drop columns that should not be amputed
     newdf = MultivariateAmputation(**kwargs).fit_transform(df_ex.select_dtypes("number")) # fit MultiariateAmputation
     newdf= pd.concat([df_cp,newdf],axis=1)
@@ -87,8 +87,7 @@ def converte(index,target,settings):
    
     config = {} #Dictionary with configuration as input for set_imputer 
     formula = "+".join(index[target])
-    #config[target]= {"formula": formula, "model_class":model_class_map[settings[target][0]],"init_kwds": {"family":family_map[settings[target][1]],"weights":weights},"perturbation_method":settings[target][2]}
-    if settings[target][0]=="sm.GLM":
+    if settings[target][0]=="sm.GLM": # different config is needed when using sm.GML
         config[target]= {"formula": formula, "model_class":model_class_map[settings[target][0]],"perturbation_method":settings[target][2],"init_kwds": {"family":family_map[settings[target][1]]}}
     else:
         config[target]= {"formula": formula, "model_class":model_class_map[settings[target][0]],"perturbation_method":settings[target][2]}
@@ -106,9 +105,9 @@ def impute(imp,type,micetype="detailedMice",burn_in=10,update_circle = 3,imputat
     if micetype=="justMice":
         imp = mice.MICEData(df) # if u want to use the standard statsmodel imputer, use justMice 
     file_name = []
-    imp.update_all(burn_in) #burn in to train the imputer
+    imp.update_all(burn_in) #burn in to train the imputer before the actual imputing, so that the imputer is trained
     for i in range(imputation_iteration):
-        imp.update_all(update_circle) #imputer is run #needs to updated
+        imp.update_all(update_circle) #imputer is run
         imp.data.to_csv(f"data/imputations/{type}{output_name}{i}d.csv" )
         file_name.append(f"data/imputations/{type}{output_name}{i}d.csv")
     return file_name
