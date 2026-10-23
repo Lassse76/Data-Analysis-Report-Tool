@@ -7,7 +7,7 @@ from sklearn.metrics import mean_absolute_error,r2_score,median_absolute_error
 
 #requirement: /
 #result: return imputation model evaluation from specified method
-def imputationevaluation(df_true,df_pred,method="mean_squared_error",**kwargs):
+def imputationevaluation(df_true,df_pred,method="root_mean_squared_error",**kwargs):
     if kwargs:
                 
         co.changeModelConfig({f"sk.{method}":{**kwargs}})
