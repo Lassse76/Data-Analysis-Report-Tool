@@ -40,26 +40,6 @@ def target(df,target,dropfeature=True):
         return (df.drop(columns= target),df[target]) #drop target
     return df[target]
 
-#requirement: 
-#result: Percentage of the five most present values of specific row and percentage of missing value is given
-def analyzevalues(df,row):
-    try:
-        print(df[row].value_counts(normalize=True).mul(100).round(1).head(5))
-        print(df[row].isna().mean())
-    except:
-        print("Error: Row not found")
-
-#requirement: missing value identifier which pandas identify as nan
-#result: Percentage of the five most present values in every row and percentage of missing value is given
-def analyzevaluesall(df):
-    try:
-        for row in df:
-            print(df[row].value_counts(normalize=True).mul(100).round(1).head(5))
-            print(df[row].value_counts(normalize=True).mul(100).round(1).tail(5))
-            print(df[row].isna().mean())
-    
-    except:
-        print("Error: Row not found")
 
 #requirement: method needs to exist and missing values have identifier which pandas identify as nan
 #result: missing values are filled and returned

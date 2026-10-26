@@ -59,17 +59,13 @@ def create_mapping(df,target,src_lookup): #Pupeline for creating the mapping
 
 #requirement: /
 #result: Initialize run
-def run(src,type="Mice",seed =42,test_split_size=0.2,target="mortality",kwds=None): #innit function, under constructions
+def run(src,kwds=None): #innit function, under constructions
     res={}
     temp_res={}
     #config is read and parameter are written to config
     co.read()
     co.readconfig_final()
     
-    co.changeConfig({"seed":seed})
-    co.changeConfig({"imputation":{"type":type}})
-    co.changeConfig({"testsplit":test_split_size})
-    co.changeConfig({"target":target})
     if kwds != None:
         co.changeConfig(kwds)
     co.writeConfig(co.data)
