@@ -43,8 +43,10 @@ def target(df,target,dropfeature=True):
 
 #requirement: method needs to exist and missing values have identifier which pandas identify as nan
 #result: missing values are filled and returned
-def complete_dataset(df,**kwargs): 
+def complete_dataset(df,method="interpolate",**kwargs): 
     #try:
+        if method =="drop":
+             return df.dropna()
         return df.interpolate(**kwargs).bfill()
     #except:
      #   print("Error:Dataframe or Method not found")
